@@ -11,5 +11,7 @@ public enum Category {
     CLOTHING,
     COSMETICS,
     LEISURE,
+    TRANSPORTATION,
+    HEALTH,
     OTHER
 }
