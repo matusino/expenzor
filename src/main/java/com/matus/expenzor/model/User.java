@@ -1,6 +1,9 @@
 package com.matus.expenzor.model;
 
+import org.hibernate.validator.constraints.Length;
+
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -12,10 +15,21 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotEmpty(message = "Please provide your first name")
     private String firstName;
+
+    @NotEmpty(message = "Please provide your last name")
     private String lastName;
+
+    @NotEmpty(message = "Please provide valid email address")
     private String emailAddress;
+
+    @Length(min = 5, message = "*Your password must have at least 5 characters")
+    @NotEmpty(message = "*Please provide your password")
     private String password;
+
+    @Transient
+    private String newPassword;
 
     @OneToMany(mappedBy = "user")
     private Set<Expense> expenses = new HashSet<>();
@@ -69,6 +83,22 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getNewPassword() {
+        return newPassword;
+    }
+
+    public void setNewPassword(String newPassword) {
+        this.newPassword = newPassword;
+    }
+
+    public Set<Expense> getExpenses() {
+        return expenses;
+    }
+
+    public void setExpenses(Set<Expense> expenses) {
+        this.expenses = expenses;
     }
 
     @Override
