@@ -1,5 +1,6 @@
 package com.matus.expenzor.controller;
 
+import com.matus.expenzor.dto.LoginRequest;
 import com.matus.expenzor.dto.RegisterRequest;
 import com.matus.expenzor.service.AuthenticationService;
 import org.springframework.http.HttpStatus;
@@ -24,4 +25,9 @@ public class AuthenticationController {
         authentificationService.signUp(registerRequest);
         return new ResponseEntity<>("User Registered", HttpStatus.OK);
     }
+
+//    @PostMapping("login")
+//    public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest){
+//        authentificationService.login(loginRequest);
+//    }
 }

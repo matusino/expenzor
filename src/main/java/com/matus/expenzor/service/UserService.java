@@ -1,7 +1,6 @@
 package com.matus.expenzor.service;
 
 import com.matus.expenzor.model.User;
-import org.graalvm.compiler.lir.LIRInstruction;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
