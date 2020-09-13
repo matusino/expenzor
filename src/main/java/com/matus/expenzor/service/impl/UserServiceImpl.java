@@ -3,11 +3,13 @@ package com.matus.expenzor.service.impl;
 import com.matus.expenzor.model.User;
 import com.matus.expenzor.repository.UserRepository;
 import com.matus.expenzor.service.UserService;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Component
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
