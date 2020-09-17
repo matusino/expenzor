@@ -1,16 +1,21 @@
 package com.matus.expenzor.service.impl;
 
+import com.matus.expenzor.dto.AuthenticationResponse;
 import com.matus.expenzor.dto.LoginRequest;
 import com.matus.expenzor.dto.RegisterRequest;
 import com.matus.expenzor.model.User;
+import com.matus.expenzor.security.JwtProvider;
 import com.matus.expenzor.service.AuthenticationService;
 import com.matus.expenzor.service.UserService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
+import java.security.KeyException;
 
 @Component
 public class AuthentificationServiceImpl implements AuthenticationService {
@@ -19,11 +24,13 @@ public class AuthentificationServiceImpl implements AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final UserService userService;
     private final AuthenticationManager authenticationManager;
+    private final JwtProvider jwtProvider;
 
-    public AuthentificationServiceImpl(PasswordEncoder passwordEncoder, UserService userService, AuthenticationManager authenticationManager) {
+    public AuthentificationServiceImpl(PasswordEncoder passwordEncoder, UserService userService, AuthenticationManager authenticationManager, JwtProvider jwtProvider) {
         this.passwordEncoder = passwordEncoder;
         this.userService = userService;
         this.authenticationManager = authenticationManager;
+        this.jwtProvider = jwtProvider;
     }
 
     @Override
@@ -37,8 +44,12 @@ public class AuthentificationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public void login(LoginRequest loginRequest) {
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUserName()
+    public AuthenticationResponse login(LoginRequest loginRequest) {
+        Authentication authenticate = authenticationManager
+                .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUserName()
                 ,loginRequest.getPassword()));
+        SecurityContextHolder.getContext().setAuthentication(authenticate);
+        String token = jwtProvider.generateToken(authenticate);
+        return new AuthenticationResponse(token,loginRequest.getUserName());
     }
 }
