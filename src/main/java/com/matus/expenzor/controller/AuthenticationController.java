@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.KeyException;
 
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/auth")
 public class AuthenticationController {
@@ -20,7 +21,7 @@ public class AuthenticationController {
         this.authentificationService = authentificationService;
     }
 
-    @PostMapping("/singup")
+    @PostMapping("/signup")
     public ResponseEntity<String> signUp(@RequestBody RegisterRequest registerRequest){
         authentificationService.signUp(registerRequest);
         return new ResponseEntity<>("User Registered", HttpStatus.OK);

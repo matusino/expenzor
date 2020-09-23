@@ -15,7 +15,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
-import java.security.KeyException;
 
 @Component
 public class AuthentificationServiceImpl implements AuthenticationService {
@@ -37,7 +36,7 @@ public class AuthentificationServiceImpl implements AuthenticationService {
     @Transactional
     public void signUp(RegisterRequest registerRequest) {
         User user = new User();
-        user.setuUserName(registerRequest.getUserName());
+        user.setuUserName(registerRequest.getUsername());
         user.setEmailAddress(registerRequest.getEmail());
         user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
         userService.saveUser(user);
@@ -46,10 +45,10 @@ public class AuthentificationServiceImpl implements AuthenticationService {
     @Override
     public AuthenticationResponse login(LoginRequest loginRequest) {
         Authentication authenticate = authenticationManager
-                .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUserName()
+                .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername()
                 ,loginRequest.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authenticate);
         String token = jwtProvider.generateToken(authenticate);
-        return new AuthenticationResponse(token,loginRequest.getUserName());
+        return new AuthenticationResponse(token,loginRequest.getUsername());
     }
 }
