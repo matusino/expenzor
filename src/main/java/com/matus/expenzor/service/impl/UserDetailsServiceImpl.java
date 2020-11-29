@@ -7,13 +7,13 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
 
-@Component
+@Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final UserService userService;
@@ -28,7 +28,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         User user =  userOpt
                 .orElseThrow(() -> new UsernameNotFoundException("User" + userName + "Not found"));
         return new org.springframework.security.core.userdetails.User(user.getUserName()
-                , user.getPassword(),true, true,
+                ,user.getPassword(),true, true,
                 true,true,getAuthorities("USER"));
     }
 
