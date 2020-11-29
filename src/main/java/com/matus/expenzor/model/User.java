@@ -1,5 +1,8 @@
 package com.matus.expenzor.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.matus.expenzor.annotation.UniqueUsername;
+import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
@@ -9,13 +12,12 @@ import java.util.Objects;
 import java.util.Set;
 
 @Entity
-public class User {
+@DynamicUpdate
+@Table(name = "user",uniqueConstraints={@UniqueConstraint(columnNames={"user_name"})})
+public class User extends BaseEntity{
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @NotEmpty(message = "Please provide your first name")
+    @Column(name = "user_name")
+    @UniqueUsername
     private String userName;
 
     @NotEmpty(message = "Please provide valid email address")
@@ -28,25 +30,17 @@ public class User {
     @Transient
     private String newPassword;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", fetch = FetchType.LAZY)
+    @JsonManagedReference
     private Set<Expense> expenses = new HashSet<>();
 
     public User() {
     }
 
-    public User(Long id, String userName, String emailAddress, String password) {
-        this.id = id;
+    public User(String userName, String emailAddress, String password) {
         this.userName = userName;
         this.emailAddress = emailAddress;
         this.password = password;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getUserName() {
@@ -94,7 +88,7 @@ public class User {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return Objects.equals(id, user.id) &&
+        return
                 Objects.equals(userName, user.userName) &&
                 Objects.equals(emailAddress, user.emailAddress) &&
                 Objects.equals(password, user.password);
@@ -102,13 +96,12 @@ public class User {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, userName, emailAddress, password);
+        return Objects.hash( userName, emailAddress, password);
     }
 
     @Override
     public String toString() {
         return "User{" +
-                "id=" + id +
                 ", firstName='" + userName + '\'' +
                 ", emailAddress='" + emailAddress + '\'' +
                 ", password='" + password + '\'' +
