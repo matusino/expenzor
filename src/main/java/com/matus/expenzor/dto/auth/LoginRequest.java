@@ -1,4 +1,4 @@
-package com.matus.expenzor.dto;
+package com.matus.expenzor.dto.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,8 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class RegisterRequest {
+public class LoginRequest {
     private String username;
-    private String email;
     private String password;
 }
