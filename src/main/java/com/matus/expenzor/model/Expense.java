@@ -1,7 +1,10 @@
 package com.matus.expenzor.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import org.springframework.lang.NonNull;
+
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.util.Date;
 
 @Entity
 public class Expense {
@@ -10,13 +13,18 @@ public class Expense {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NonNull
+    private int value;
+
     private String description; //this will be optional
-    private LocalDateTime date;
+
+    private Date date;
 
     @Enumerated(EnumType.STRING)
     private Category category;
 
     @ManyToOne
+    @JsonBackReference
     private User user;
 
     public Expense() {
@@ -24,6 +32,14 @@ public class Expense {
 
     public Long getId() {
         return id;
+    }
+
+    public int getValue() {
+        return value;
+    }
+
+    public void setValue(int value) {
+        this.value = value;
     }
 
     public String getDescription() {
@@ -42,11 +58,11 @@ public class Expense {
         this.category = category;
     }
 
-    public LocalDateTime getDate() {
+    public Date getDate() {
         return date;
     }
 
-    public void setDate(LocalDateTime date) {
+    public void setDate(Date date) {
         this.date = date;
     }
 
@@ -58,4 +74,15 @@ public class Expense {
         this.user = user;
     }
 
+    @Override
+    public String toString() {
+        return "Expense{" +
+                "id=" + id +
+                ", value=" + value +
+                ", description='" + description + '\'' +
+                ", date=" + date +
+                ", category=" + category +
+                ", user=" + user +
+                '}';
+    }
 }
