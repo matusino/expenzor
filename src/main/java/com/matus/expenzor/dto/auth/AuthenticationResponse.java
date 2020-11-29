@@ -1,4 +1,4 @@
-package com.matus.expenzor.dto;
+package com.matus.expenzor.dto.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

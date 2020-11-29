@@ -1,8 +1,9 @@
 package com.matus.expenzor.service.impl;
 
-import com.matus.expenzor.dto.AuthenticationResponse;
-import com.matus.expenzor.dto.LoginRequest;
-import com.matus.expenzor.dto.RegisterRequest;
+import com.matus.expenzor.dto.auth.AuthenticationResponse;
+import com.matus.expenzor.dto.auth.LoginRequest;
+import com.matus.expenzor.dto.auth.RegisterRequest;
+import com.matus.expenzor.dto.user.UserProfile;
 import com.matus.expenzor.model.User;
 import com.matus.expenzor.security.JwtProvider;
 import com.matus.expenzor.service.AuthenticationService;
@@ -50,5 +51,13 @@ public class AuthentificationServiceImpl implements AuthenticationService {
         SecurityContextHolder.getContext().setAuthentication(authenticate);
         String token = jwtProvider.generateToken(authenticate);
         return new AuthenticationResponse(token,loginRequest.getUsername());
+    }
+
+    @Override
+    public boolean matchPassword(User user , UserProfile userProfile) {
+        String dbPassword = user.getPassword();
+        String oldPassword = userProfile.getPassword();
+
+        return passwordEncoder.matches(oldPassword, dbPassword);
     }
 }

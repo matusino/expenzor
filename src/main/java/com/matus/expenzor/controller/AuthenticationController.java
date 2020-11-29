@@ -1,8 +1,8 @@
 package com.matus.expenzor.controller;
 
-import com.matus.expenzor.dto.AuthenticationResponse;
-import com.matus.expenzor.dto.LoginRequest;
-import com.matus.expenzor.dto.RegisterRequest;
+import com.matus.expenzor.dto.auth.AuthenticationResponse;
+import com.matus.expenzor.dto.auth.LoginRequest;
+import com.matus.expenzor.dto.auth.RegisterRequest;
 import com.matus.expenzor.service.AuthenticationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
