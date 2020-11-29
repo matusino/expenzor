@@ -18,7 +18,6 @@ import java.time.Instant;
 import java.util.Date;
 import java.util.function.Function;
 
-import static io.jsonwebtoken.Jwts.parser;
 import static java.util.Date.from;
 
 @Service
