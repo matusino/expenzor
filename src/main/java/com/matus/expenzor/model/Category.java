@@ -13,5 +13,6 @@ public enum Category {
     LEISURE,
     TRANSPORTATION,
     HEALTH,
-    OTHER
+    OTHER,
+    INCOME
 }
