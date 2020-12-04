@@ -23,19 +23,8 @@ public class ExpenseServiceImpl implements ExpenseService {
     }
 
     @Override
-    public List<Expense> findByUserId(Long id) {
-        return expenseRepository.findByUserId(id);
-    }
-
-    @Override
     public List<Expense> findByCategory(Category category) {
         return expenseRepository.findByCategory(category);
-    }
-
-    @Override
-    public List<Expense> findByMonth() {
-        //
-        return null;
     }
 
     @Override
@@ -52,6 +41,13 @@ public class ExpenseServiceImpl implements ExpenseService {
             listDto.add(expenseDto);
         }
         return listDto;
+    }
+
+    @Override
+    public List<Expense> findAllUserExpenses(int userId) {
+        List<Expense> list = new ArrayList<>();
+        expenseRepository.findExpenseByUserId(userId).forEach(list::add);
+        return list ;
     }
 
     @Override

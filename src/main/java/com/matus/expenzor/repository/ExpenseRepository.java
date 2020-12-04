@@ -17,4 +17,6 @@ public interface ExpenseRepository extends CrudRepository<Expense, Long> {
     @Query("SELECT e FROM Expense e WHERE month(e.date) = :month AND user_id = :user_id")
     List<Expense> findExpenseByMonth(@Param("month") int month, @Param("user_id") int user_id);
 
+    @Query("SELECT e FROM Expense e WHERE user_id = :user_id")
+    List<Expense> findExpenseByUserId(int user_id);
 }

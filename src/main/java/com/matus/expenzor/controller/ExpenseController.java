@@ -5,10 +5,13 @@ import com.matus.expenzor.model.Expense;
 import com.matus.expenzor.model.User;
 import com.matus.expenzor.service.ExpenseService;
 import com.matus.expenzor.service.UserService;
+import com.matus.expenzor.utils.ExcelExporter;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.security.Principal;
 import java.util.List;
 
@@ -64,5 +67,26 @@ public class ExpenseController {
     public ResponseEntity deleteExpenseById(@PathVariable Long id){
         expenseService.deleteExpenseById(id);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/export/excel/{month}")
+    public void exportToExcel(@PathVariable int month, HttpServletResponse response, Principal principal) throws IOException {
+        response.setContentType("blob");
+        String headerKey = "Content-Disposition";
+        String headerValue = "attachment; filename=expenses.xlsx";
+
+        response.setHeader(headerKey, headerValue);
+
+
+        if (month == 0){
+            List<Expense> expenses = expenseService.findAllUserExpenses(userService.fetchUserId(principal.getName()));
+            ExcelExporter excelExporter = new ExcelExporter(expenses);
+            excelExporter.export(response);
+        }else {
+            List<Expense> expenses = expenseService.findByMonth(month, userService.fetchUserId(principal.getName()));
+            ExcelExporter excelExporter = new ExcelExporter(expenses);
+
+            excelExporter.export(response);
+        }
     }
 }
