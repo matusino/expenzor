@@ -36,6 +36,7 @@ public class JwtProvider {
 
     }
 
+    // TODO: 12/14/2020 change to shorter period + implement token refresh
     public String generateToken(Authentication authentication) {
         User principal = (User) authentication.getPrincipal();
         return Jwts.builder()
@@ -50,7 +51,7 @@ public class JwtProvider {
         try {
             return (PrivateKey) keyStore.getKey("springblog", "secret".toCharArray());
         } catch (KeyStoreException | NoSuchAlgorithmException | UnrecoverableKeyException e) {
-            throw new KeyException("Exception occured while retrieving public key from keystore", e);
+            throw new KeyException("Exception occurred while retrieving public key from keystore", e);
         }
     }
 
@@ -58,8 +59,7 @@ public class JwtProvider {
         try {
             return keyStore.getCertificate("springblog").getPublicKey();
         } catch (KeyStoreException e) {
-            throw new KeyException("Exception occured while " +
-                    "retrieving public key from keystore", e);
+            throw new KeyException("Exception occurred while retrieving public key from keystore", e);
         }
     }
 
