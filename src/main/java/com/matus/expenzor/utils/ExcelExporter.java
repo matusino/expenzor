@@ -1,6 +1,5 @@
 package com.matus.expenzor.utils;
 
-import com.matus.expenzor.dto.expense.ExpenseDto;
 import com.matus.expenzor.model.Expense;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;

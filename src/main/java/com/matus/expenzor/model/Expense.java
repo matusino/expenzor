@@ -1,11 +1,18 @@
 package com.matus.expenzor.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.lang.NonNull;
 
 import javax.persistence.*;
 import java.util.Date;
 
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 public class Expense {
 
@@ -16,7 +23,7 @@ public class Expense {
     @NonNull
     private int value;
 
-    private String description; //this will be optional
+    private String description;
 
     private Date date;
 
@@ -27,62 +34,4 @@ public class Expense {
     @JsonBackReference
     private User user;
 
-    public Expense() {
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public int getValue() {
-        return value;
-    }
-
-    public void setValue(int value) {
-        this.value = value;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Category getCategory() {
-        return category;
-    }
-
-    public void setCategory(Category category) {
-        this.category = category;
-    }
-
-    public Date getDate() {
-        return date;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    @Override
-    public String toString() {
-        return "Expense{" +
-                "id=" + id +
-                ", value=" + value +
-                ", description='" + description + '\'' +
-                ", date=" + date +
-                ", category=" + category +
-                ", user=" + user +
-                '}';
-    }
 }
