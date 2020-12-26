@@ -1,7 +1,5 @@
 package com.matus.expenzor.service.impl;
 
-import com.matus.expenzor.dto.expense.ExpenseDto;
-import com.matus.expenzor.model.Category;
 import com.matus.expenzor.model.Expense;
 import com.matus.expenzor.repository.ExpenseRepository;
 import com.matus.expenzor.service.ExpenseService;
@@ -23,30 +21,9 @@ public class ExpenseServiceImpl implements ExpenseService {
     }
 
     @Override
-    public List<Expense> findByCategory(Category category) {
-        return expenseRepository.findByCategory(category);
-    }
-
-    @Override
-    public List<ExpenseDto> findAll() {
-        List<Expense> list = new ArrayList<>();
-        List<ExpenseDto> listDto = new ArrayList<>();
-        expenseRepository.findAll().forEach(list::add);
-        for(Expense expense : list){
-            ExpenseDto expenseDto = new ExpenseDto();
-            expenseDto.setDescription(expense.getDescription());
-            expenseDto.setValue(expense.getValue());
-            expenseDto.setCategory(expense.getCategory());
-            expenseDto.setDate(expense.getDate());
-            listDto.add(expenseDto);
-        }
-        return listDto;
-    }
-
-    @Override
     public List<Expense> findAllUserExpenses(int userId) {
         List<Expense> list = new ArrayList<>();
-        expenseRepository.findExpenseByUserId(userId).forEach(list::add);
+        expenseRepository.findExpenseByUserId(userId).forEach(list ::add);
         return list ;
     }
 

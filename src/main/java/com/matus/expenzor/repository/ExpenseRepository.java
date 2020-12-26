@@ -10,8 +10,6 @@ import java.util.List;
 
 public interface ExpenseRepository extends CrudRepository<Expense, Long> {
 
-    List<Expense> findByUserId(Long id);
-
     List<Expense> findByCategory(Category category);
 
     @Query("SELECT e FROM Expense e WHERE month(e.date) = :month AND user_id = :user_id")
