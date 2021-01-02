@@ -10,11 +10,11 @@ public interface ExpenseService {
 
     Expense addExpense(Expense expense);
 
-    List<Expense> findByMonth(int month, int userId);
+    List<Expense> findByMonth(int month, int year, int userId);
 
     void deleteExpenseById(Long id);
 
-    List<Expense> findAllUserExpenses(int userId);
+    List<Expense> findAllUserExpenses(int userId, int year);
 
 
 }

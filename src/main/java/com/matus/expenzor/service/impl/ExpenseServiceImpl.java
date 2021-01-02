@@ -21,16 +21,16 @@ public class ExpenseServiceImpl implements ExpenseService {
     }
 
     @Override
-    public List<Expense> findAllUserExpenses(int userId) {
+    public List<Expense> findAllUserExpenses(int userId, int year) {
         List<Expense> list = new ArrayList<>();
-        expenseRepository.findExpenseByUserId(userId).forEach(list ::add);
+        expenseRepository.findExpenseByUserId(userId, year).forEach(list ::add);
         return list ;
     }
 
     @Override
-    public List<Expense> findByMonth(int month, int userId) {
+    public List<Expense> findByMonth(int month, int year, int userId) {
         List<Expense> list = new ArrayList<>();
-        expenseRepository.findExpenseByMonth(month, userId).forEach(list::add);
+        expenseRepository.findExpenseByMonth(month,year, userId).forEach(list::add);
         return list;
     }
 

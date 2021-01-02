@@ -12,9 +12,9 @@ public interface ExpenseRepository extends CrudRepository<Expense, Long> {
 
     List<Expense> findByCategory(Category category);
 
-    @Query("SELECT e FROM Expense e WHERE month(e.date) = :month AND user_id = :user_id")
-    List<Expense> findExpenseByMonth(@Param("month") int month, @Param("user_id") int user_id);
+    @Query("SELECT e FROM Expense e WHERE month(e.date) = :month AND year(e.date) = :year AND user_id = :user_id")
+    List<Expense> findExpenseByMonth(@Param("month") int month, @Param("year") int year, @Param("user_id") int user_id);
 
-    @Query("SELECT e FROM Expense e WHERE user_id = :user_id")
-    List<Expense> findExpenseByUserId(int user_id);
+    @Query("SELECT e FROM Expense e WHERE user_id = :user_id AND year(e.date) = :year")
+    List<Expense> findExpenseByUserId(int user_id, @Param("year") int year);
 }
