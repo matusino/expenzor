@@ -29,10 +29,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("User" + userName + "Not found"));
         return new org.springframework.security.core.userdetails.User(user.getUserName()
                 ,user.getPassword(),true, true,
-                true,true,getAuthorities("USER"));
+                true,true,getAuthorities());
     }
 
-    private Collection<? extends GrantedAuthority> getAuthorities(String role) {
-        return Collections.singletonList(new SimpleGrantedAuthority(role));
+    private Collection<? extends GrantedAuthority> getAuthorities() {
+        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
     }
 }
