@@ -15,7 +15,6 @@ import java.util.Date;
 @NoArgsConstructor
 public class ExpenseDto {
 
-    @NotNull
     private Long id;
 
     @NotNull(message = "*Please provide date")

@@ -4,6 +4,7 @@ import com.matus.expenzor.dto.auth.RegisterResponse;
 import com.matus.expenzor.dto.auth.LoginRequest;
 import com.matus.expenzor.dto.auth.RegisterRequest;
 import com.matus.expenzor.service.AuthenticationService;
+import lombok.AllArgsConstructor;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,15 +17,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "*")
+@AllArgsConstructor
 @RestController
 @RequestMapping("/auth")
 public class AuthenticationController {
 
-    private final AuthenticationService authentificationService;
-
-    public AuthenticationController(AuthenticationService authentificationService) {
-        this.authentificationService = authentificationService;
-    }
+    private final AuthenticationService authenticationService;
 
     @PostMapping("/signup")
     public ResponseEntity<Object> signUp(@Valid @RequestBody RegisterRequest registerRequest, BindingResult bindingResult){
@@ -34,12 +32,12 @@ public class AuthenticationController {
                     .collect(Collectors.toList());
             return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
         }
-        authentificationService.signUp(registerRequest);
+        authenticationService.signUp(registerRequest);
         return new ResponseEntity<>("User Registered", HttpStatus.OK);
     }
 
     @PostMapping("/login")
     public RegisterResponse login(@RequestBody LoginRequest loginRequest) throws KeyException {
-        return authentificationService.login(loginRequest);
+        return authenticationService.login(loginRequest);
     }
 }

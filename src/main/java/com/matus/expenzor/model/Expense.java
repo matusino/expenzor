@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -23,8 +24,10 @@ public class Expense {
     @NonNull
     private int value;
 
+    @Nullable
     private String description;
 
+    @Nullable
     private Date date;
 
     @Enumerated(EnumType.STRING)
