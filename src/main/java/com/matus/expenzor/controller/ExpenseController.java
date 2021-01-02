@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-@CrossOrigin(origins = "*")
+@CrossOrigin("*")
 @RestController
 @AllArgsConstructor
 @RequestMapping("/expense")
@@ -53,24 +53,20 @@ public class ExpenseController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/get-all")
-    public ResponseEntity getExpensesByLoggedUser(Principal principal){
-        Optional <User> user = userService.findByUserName(principal.getName());
-        if(user.isPresent()){
-            if(user.get().getExpenses().isEmpty()){
-                return new ResponseEntity<>(null,HttpStatus.OK);
-            }else {
-                return new ResponseEntity<>(userMapper.userToDto(user.get()).getExpenses(),HttpStatus.OK);
-            }
+    @GetMapping("/get-all/{year}")
+    public ResponseEntity getAllExpensesPerYearForLoggedUser(@PathVariable int year , Principal principal){
+        List<Expense> expenses = expenseService.findAllUserExpenses(userService.fetchUserId(principal.getName()), year);
+        if(!expenses.isEmpty()) {
+            return new ResponseEntity<>(expenses, HttpStatus.OK);
         }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(null,HttpStatus.BAD_REQUEST);
     }
 
-    @GetMapping("/get/expenses/{month}/{username}")
-    public ResponseEntity getExpensesByMonth(@PathVariable int month, @PathVariable String username) {
+    @GetMapping("/get/expenses/{month}/{year}/{username}")
+    public ResponseEntity getExpensesByMonthForCurrentYear(@PathVariable int month, @PathVariable int year, @PathVariable String username) {
         Optional<User> user = userService.findByUserName(username);
         if (user.isPresent()) {
-            List<Expense> expenses = expenseService.findByMonth(month, userService.fetchUserId(username));
+            List<Expense> expenses = expenseService.findByMonth(month, year, userService.fetchUserId(username));
             return new ResponseEntity<>(expenseMapper.expenseListToDto(expenses), HttpStatus.OK);
         }else
             return new ResponseEntity<>(null, HttpStatus.OK);
@@ -82,8 +78,8 @@ public class ExpenseController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/export/excel/{month}")
-    public void exportToExcel(@PathVariable int month, HttpServletResponse response, Principal principal) throws IOException {
+    @GetMapping("/export/excel/{month}/{year}")
+    public void exportToExcel(@PathVariable int month, @PathVariable int year, HttpServletResponse response, Principal principal) throws IOException {
         response.setContentType("blob");
         String headerKey = "Content-Disposition";
         String headerValue = "attachment; filename=expenses.xlsx";
@@ -91,11 +87,11 @@ public class ExpenseController {
         response.setHeader(headerKey, headerValue);
 
         if (month == 0){
-            List<Expense> expenses = expenseService.findAllUserExpenses(userService.fetchUserId(principal.getName()));
+            List<Expense> expenses = expenseService.findAllUserExpenses(userService.fetchUserId(principal.getName()), year);
             ExcelExporter excelExporter = new ExcelExporter(expenses);
             excelExporter.export(response);
         }else {
-            List<Expense> expenses = expenseService.findByMonth(month, userService.fetchUserId(principal.getName()));
+            List<Expense> expenses = expenseService.findByMonth(month, year, userService.fetchUserId(principal.getName()));
             ExcelExporter excelExporter = new ExcelExporter(expenses);
 
             excelExporter.export(response);
