@@ -1,19 +1,23 @@
 package com.matus.expenzor.utils;
 
 import com.matus.expenzor.model.Expense;
+import lombok.NoArgsConstructor;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.stereotype.Component;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+@Component
+@NoArgsConstructor
 public class ExcelExporter {
     private XSSFWorkbook workbook;
     private XSSFSheet sheet;
@@ -52,7 +56,7 @@ public class ExcelExporter {
     }
 
     private void writeDataLines(){
-        SimpleDateFormat format = new SimpleDateFormat("dd-MM-YYYY");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         int rowCount = 1;
 
         CellStyle style = workbook.createCellStyle();
@@ -64,7 +68,7 @@ public class ExcelExporter {
             Row row = sheet.createRow(rowCount++);
             int columnCount = 0;
 
-            createCell(row, columnCount++, format.format(expense.getDate()), style);
+            createCell(row, columnCount++, expense.getDate().format(formatter), style);
             createCell(row, columnCount++, expense.getValue(), style);
             createCell(row, columnCount++, expense.getCategory().toString(), style);
             createCell(row, columnCount++, expense.getDescription(), style);
