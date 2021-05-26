@@ -13,10 +13,10 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 public class UserProfileDto {
 
-    @NotNull
+    @NotNull(message = "Username cannot be null")
     private String username;
 
-    @NotNull
+    @NotNull(message = "Email cannot be null")
     @Email
     private String email;
 
