@@ -7,8 +7,8 @@ import com.matus.expenzor.model.Expense;
 import com.matus.expenzor.model.User;
 import com.matus.expenzor.service.ExpenseService;
 import com.matus.expenzor.service.UserService;
-import com.matus.expenzor.utils.ExcelExporter;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
@@ -19,6 +19,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.security.Principal;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -26,7 +28,8 @@ import java.util.stream.Collectors;
 @CrossOrigin("*")
 @RestController
 @AllArgsConstructor
-@RequestMapping("/expense")
+@Slf4j
+@RequestMapping("/expenses")
 public class ExpenseController {
 
     private final ExpenseService expenseService;
@@ -34,67 +37,77 @@ public class ExpenseController {
     private final ExpenseMapper expenseMapper;
     private final UserMapper userMapper;
 
-    @PostMapping("/add")
-    public ResponseEntity addNewExpense(@Valid @RequestBody ExpenseDto expenseDto, BindingResult bindingResult, Principal principal){
+    @PostMapping
+    public ResponseEntity addNewExpense(@Valid @RequestBody ExpenseDto expenseDto, BindingResult bindingResult, Principal principal) {
         if (bindingResult.hasErrors()) {
             List<String> errors = bindingResult.getAllErrors().stream()
                     .map(DefaultMessageSourceResolvable::getDefaultMessage)
                     .collect(Collectors.toList());
+            log.error(errors.toString());
             return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+        }
+        Optional<User> user = userService.findByUserName(principal.getName());
+        if (user.isPresent()) {
+            expenseDto.setUser(userMapper.userToDto(user.get()));
+            expenseService.addExpense(expenseMapper.toExpense(expenseDto));
+            return ResponseEntity.ok().build();
         } else {
-            Optional <User> user = userService.findByUserName(principal.getName());
-            if(user.isPresent()){
-                expenseDto.setUser(userMapper.userToDto(user.get()));
-                expenseService.addExpense(expenseMapper.toExpense(expenseDto));
-            }else {
-                return ResponseEntity.notFound().build();
-            }
+            log.debug("User with username " + principal.getName() + " not found");
+            return new ResponseEntity<>("User not found", HttpStatus.BAD_REQUEST);
         }
-        return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/get-all/{year}")
-    public ResponseEntity getAllExpensesPerYearForLoggedUser(@PathVariable int year , Principal principal){
+    @GetMapping("/{year}")
+    public ResponseEntity getAllExpensesForYearForLoggedUser(@PathVariable int year, Principal principal) {
         List<Expense> expenses = expenseService.findAllUserExpenses(userService.fetchUserId(principal.getName()), year);
-        if(!expenses.isEmpty()) {
-            return new ResponseEntity<>(expenses, HttpStatus.OK);
+        if (expenses.isEmpty()) {
+            log.debug("No Expenses for user " + principal.getName() + " for year " + year);
+            return new ResponseEntity(HttpStatus.NO_CONTENT);
         }
-        return new ResponseEntity<>(null,HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(expenses, HttpStatus.OK);
     }
 
-    @GetMapping("/get/expenses/{month}/{year}/{username}")
-    public ResponseEntity getExpensesByMonthForCurrentYear(@PathVariable int month, @PathVariable int year, @PathVariable String username) {
+    @GetMapping("/{month}/{year}/{username}")
+    public ResponseEntity getExpensesByMonthForCurrentYear(@PathVariable int month, @PathVariable int year, @PathVariable String username, Principal principal) {
+        if (!username.equalsIgnoreCase(principal.getName())) {
+            log.error("Invalid user name" + username);
+            return ResponseEntity.badRequest().build();
+        }
         Optional<User> user = userService.findByUserName(username);
         if (user.isPresent()) {
             List<Expense> expenses = expenseService.findByMonth(month, year, userService.fetchUserId(username));
             return new ResponseEntity<>(expenseMapper.expenseListToDto(expenses), HttpStatus.OK);
-        }else
-            return new ResponseEntity<>(null, HttpStatus.OK);
+        } else
+            log.debug("No Expenses for user " + principal.getName() + " for year " + year + month);
+            return ResponseEntity.notFound().build();
     }
 
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity deleteExpenseById(@PathVariable Long id){
-        expenseService.deleteExpenseById(id);
-        return ResponseEntity.ok().build();
+    @DeleteMapping("/{id}")
+    public ResponseEntity deleteExpenseById(@PathVariable Long id) {
+        try {
+            expenseService.deleteExpenseById(id);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
-    @GetMapping("/export/excel/{month}/{year}")
-    public void exportToExcel(@PathVariable int month, @PathVariable int year, HttpServletResponse response, Principal principal) throws IOException {
-        response.setContentType("blob");
+    @GetMapping("/xls/{month}/{year}")
+    public ResponseEntity exportToExcel(@PathVariable int month, @PathVariable int year, HttpServletResponse response, Principal principal) throws IOException {
+        response.setContentType("application/vnd.ms-excel");
         String headerKey = "Content-Disposition";
         String headerValue = "attachment; filename=expenses.xlsx";
 
         response.setHeader(headerKey, headerValue);
 
-        if (month == 0){
+        if (month == 0) {
             List<Expense> expenses = expenseService.findAllUserExpenses(userService.fetchUserId(principal.getName()), year);
-            ExcelExporter excelExporter = new ExcelExporter(expenses);
-            excelExporter.export(response);
-        }else {
+            expenseService.export(response, expenses);
+        } else {
             List<Expense> expenses = expenseService.findByMonth(month, year, userService.fetchUserId(principal.getName()));
-            ExcelExporter excelExporter = new ExcelExporter(expenses);
-
-            excelExporter.export(response);
+            expenseService.export(response, expenses);
         }
+        return ResponseEntity.ok().build();
     }
 }
