@@ -56,7 +56,7 @@ public class UserControllerTestIT extends BaseTest {
     private WebApplicationContext webApplicationContext;
 
     @Autowired
-    BCryptPasswordEncoder passwordEncoder;
+    private BCryptPasswordEncoder passwordEncoder;
 
     @BeforeEach
     void setup(){
@@ -109,7 +109,7 @@ public class UserControllerTestIT extends BaseTest {
                 .content(asJsonString(newPassword)))
                 .andExpect(status().isOk());
         Optional<User> updatedUser = userService.findByUserName("userName");
-        assertThat(updatedUser.get().getPassword()).isEqualTo(newPassword.getNewPassword());
+        assertThat(passwordEncoder.matches(newPassword.getNewPassword(), updatedUser.get().getPassword()));
     }
 
     @Test

@@ -18,12 +18,9 @@ import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.ArrayList;
 import java.util.Optional;
-import org.hamcrest.Matchers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -33,7 +30,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = UserController.class)
@@ -77,7 +73,7 @@ class UserControllerTest {
         given(userService.findByUserName(any(String.class))).willReturn(Optional.of(user));
         given(userService.userToUserProfileDto(user)).willReturn(userProfileDto);
 
-        mockMvc.perform(get("/users/" + user.getUserName())
+        mockMvc.perform(get("/users/{username}", user.getUserName())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.username", is(user.getUserName())))
                 .andExpect(status().isOk());
@@ -91,7 +87,7 @@ class UserControllerTest {
     @WithMockUser(username="testUserName",password = "pass")
     void shouldRestrictAndNotGetUserByUserName() throws Exception {
         given(userService.findByUserName(any(String.class))).willReturn(Optional.empty());
-        mockMvc.perform(get("/users/" + "incorrectUserName"))
+        mockMvc.perform(get("/users/{username}","incorrectUserName"))
                 .andExpect(status().is4xxClientError());
 
     }
@@ -105,13 +101,14 @@ class UserControllerTest {
         userProfile.setFirstName("newFirstName");
 
         given(userService.findByUserName(any(String.class))).willReturn(Optional.of(user));
-        MvcResult result = mockMvc.perform(patch("/users/" + user.getUserName())
+        mockMvc.perform(patch("/users/{username}", user.getUserName())
                 .content(asJsonString(userProfile))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk()).andReturn();
+                .andExpect(status().isOk());
         then(userService).should().updateExistingUser(user,userProfile);
     }
+
     @Test
     @WithMockUser(username="testUserName",password = "pass")
     void shouldFailUpdateUserProfileInvalidInput() throws Exception {
@@ -121,7 +118,7 @@ class UserControllerTest {
         userProfile.setFirstName("newFirstName");
 
         given(userService.findByUserName(any(String.class))).willReturn(Optional.of(user));
-        mockMvc.perform(patch("/users/" + user.getUserName())
+        mockMvc.perform(patch("/users/{username}", user.getUserName())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(userProfile))
                 .accept(MediaType.APPLICATION_JSON))
@@ -138,7 +135,7 @@ class UserControllerTest {
         userProfile.setFirstName("newFirstName");
 
         given(userService.findByUserName(any(String.class))).willReturn(Optional.empty());
-        mockMvc.perform(patch("/users/" + user.getUserName())
+        mockMvc.perform(patch("/users/{username}", user.getUserName())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(userProfile))
                 .accept(MediaType.APPLICATION_JSON))
@@ -146,58 +143,62 @@ class UserControllerTest {
     }
 
     @Test
-    @WithMockUser(username="testUserName",password = "password")
+    @WithMockUser(username="testUserName")
     void shouldChangePassword() throws Exception {
         PasswordDTO password = new PasswordDTO("password","newPassword","newPassword");
         given(userService.findByUserName(any(String.class))).willReturn(Optional.of(user));
         given(authenticationService.matchPassword(user, password)).willReturn(true);
-        mockMvc.perform(patch("/users/password/" + user.getUserName())
+
+        mockMvc.perform(patch("/users/password/{username}", user.getUserName())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(password)))
                 .andExpect(status().isOk());
-        then(userService).should().saveUser(user);
+
+        then(authenticationService).should().changePassword(user, password.getNewPassword());
     }
     @Test
-    @WithMockUser(username="testUserName",password = "password")
+    @WithMockUser(username="testUserName")
     void shouldFailChangePassword() throws Exception {
         PasswordDTO password = new PasswordDTO("password","newPassword","newPassword");
-        mockMvc.perform(patch("/users/password/" + user.getUserName())
+
+        mockMvc.perform(patch("/users/password/{username}", user.getUserName())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(password)))
                 .andExpect(status().is4xxClientError());
-
     }
+
     @Test
     @WithMockUser(username="testUserName",password = "password")
     void shouldFailChangePasswordOldPasswordDoNotMatchNewPassword() throws Exception {
         PasswordDTO password = new PasswordDTO("password","newPassword","newPassword");
         given(userService.findByUserName(any(String.class))).willReturn(Optional.of(user));
-        mockMvc.perform(patch("/users/password/" + user.getUserName())
+
+        mockMvc.perform(patch("/users/password/{username}", user.getUserName())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(password)))
                 .andExpect(status().is4xxClientError());
-
     }
+
     @Test
     @WithMockUser(username="testUserName",password = "password")
     void shouldFailPasswordChangeInvalidInput() throws Exception {
         PasswordDTO password = new PasswordDTO(null,"newPassword","newPassword");
-        mockMvc.perform(patch("/users/password/" + user.getUserName())
+
+        mockMvc.perform(patch("/users/password/{username}", user.getUserName())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(password)))
                 .andExpect(content().string(containsString("*Please provide your password")))
                 .andExpect(status().is4xxClientError());
-
     }
 
     @Test
-    @WithMockUser(username="testUserName",password = "pass")
+    @WithMockUser(username="testUserName")
     void deleteUser() throws Exception {
         mockMvc.perform(delete("/users/{id}", 1L))
                 .andExpect(status().isOk());
     }
 
-    public static String asJsonString(final Object obj) {
+    static String asJsonString(final Object obj) {
         try {
             return new ObjectMapper().writeValueAsString(obj);
         } catch (Exception e) {

@@ -30,7 +30,6 @@ public class UserController {
 
     private final UserService userService;
     private final AuthenticationService authenticationService;
-    private final BCryptPasswordEncoder passwordEncoder;
 
     @GetMapping(value = "/{username}" ,produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
@@ -42,7 +41,7 @@ public class UserController {
             return new ResponseEntity<>(userService.userToUserProfileDto(user.get()), responseHeaders, HttpStatus.OK);
         } else {
             log.error("User " + username + " not found");
-            return new ResponseEntity(null, HttpStatus.NOT_FOUND);
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
     }
 
@@ -81,8 +80,7 @@ public class UserController {
         if (userDB.isPresent()) {
             if (authenticationService.matchPassword(userDB.get(), passwordDTO) &&
                     passwordDTO.getNewPassword().equals(passwordDTO.getConfirmNewPassword())) {
-                userDB.get().setPassword(passwordEncoder.encode(passwordDTO.getNewPassword()));
-                userService.saveUser(userDB.get());
+                authenticationService.changePassword(userDB.get(), passwordDTO.getNewPassword());
                 return ResponseEntity.ok().build();
             } else {
                 log.error("Password change not successful. Passwords do not match");
@@ -101,7 +99,7 @@ public class UserController {
             return ResponseEntity.ok().build();
         }catch (Exception e){
             log.error(e.getMessage(),e);
-            return ResponseEntity.notFound().build();
+            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }
