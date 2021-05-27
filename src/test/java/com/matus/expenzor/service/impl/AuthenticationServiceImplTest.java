@@ -26,7 +26,7 @@ import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class AuthentificationServiceImplTest {
+class AuthenticationServiceImplTest {
 
     @Mock
     PasswordEncoder passwordEncoder;
@@ -44,7 +44,7 @@ class AuthentificationServiceImplTest {
     ArgumentCaptor<RegisterRequest> captor;
 
     @InjectMocks
-    AuthentificationServiceImpl authService;
+    AuthenticationServiceImpl authService;
 
     @Test
     void shouldSignUp() {
@@ -54,7 +54,6 @@ class AuthentificationServiceImplTest {
         authService.signUp(registerRequest);
         //then
         then(userService).should().saveUser(new User());
-
         verify(userService, times(1)).saveUser(new User());
         verify(passwordEncoder, times(1)).encode(registerRequest.getPassword());
 
@@ -84,7 +83,6 @@ class AuthentificationServiceImplTest {
         PasswordDTO passwordDTO = new PasswordDTO();
         passwordDTO.setPassword("password");
 
-//        given(passwordEncoder.matches(user.getPassword(), passwordDTO.getPassword())).willReturn(true);
         //when
         boolean match = authService.matchPassword(user, passwordDTO);
 

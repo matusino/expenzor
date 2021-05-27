@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 import javax.transaction.Transactional;
 
 @Component
-public class AuthentificationServiceImpl implements AuthenticationService {
+public class AuthenticationServiceImpl implements AuthenticationService {
 
 
     private final PasswordEncoder passwordEncoder;
@@ -26,7 +26,7 @@ public class AuthentificationServiceImpl implements AuthenticationService {
     private final AuthenticationManager authenticationManager;
     private final JwtProvider jwtProvider;
 
-    public AuthentificationServiceImpl(PasswordEncoder passwordEncoder, UserService userService, AuthenticationManager authenticationManager, JwtProvider jwtProvider) {
+    public AuthenticationServiceImpl(PasswordEncoder passwordEncoder, UserService userService, AuthenticationManager authenticationManager, JwtProvider jwtProvider) {
         this.passwordEncoder = passwordEncoder;
         this.userService = userService;
         this.authenticationManager = authenticationManager;
@@ -57,7 +57,12 @@ public class AuthentificationServiceImpl implements AuthenticationService {
     public boolean matchPassword(User user , PasswordDTO passwordDTO) {
         String dbPassword = user.getPassword();
         String oldPassword = passwordDTO.getPassword();
-
         return passwordEncoder.matches(oldPassword, dbPassword);
+    }
+
+    @Override
+    public void changePassword(User user, String newPassword) {
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userService.saveUser(user);
     }
 }
