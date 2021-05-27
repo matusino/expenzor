@@ -50,7 +50,7 @@ public class ExpenseController {
         if (user.isPresent()) {
             expenseDto.setUser(userMapper.userToDto(user.get()));
             expenseService.addExpense(expenseMapper.toExpense(expenseDto));
-            return ResponseEntity.ok().build();
+            return new ResponseEntity(HttpStatus.CREATED);
         } else {
             log.debug("User with username " + principal.getName() + " not found");
             return new ResponseEntity<>("User not found", HttpStatus.BAD_REQUEST);
@@ -79,7 +79,7 @@ public class ExpenseController {
             return new ResponseEntity<>(expenseMapper.expenseListToDto(expenses), HttpStatus.OK);
         } else
             log.debug("No Expenses for user " + principal.getName() + " for year " + year + month);
-            return ResponseEntity.notFound().build();
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
     }
 
     @DeleteMapping("/{id}")
@@ -94,7 +94,7 @@ public class ExpenseController {
     }
 
     @GetMapping("/xls/{month}/{year}")
-    public ResponseEntity exportToExcel(@PathVariable int month, @PathVariable int year, HttpServletResponse response, Principal principal) throws IOException {
+    public void exportToExcel(@PathVariable int month, @PathVariable int year, HttpServletResponse response, Principal principal) throws IOException {
         response.setContentType("application/vnd.ms-excel");
         String headerKey = "Content-Disposition";
         String headerValue = "attachment; filename=expenses.xlsx";
@@ -108,6 +108,5 @@ public class ExpenseController {
             List<Expense> expenses = expenseService.findByMonth(month, year, userService.fetchUserId(principal.getName()));
             expenseService.export(response, expenses);
         }
-        return ResponseEntity.ok().build();
     }
 }

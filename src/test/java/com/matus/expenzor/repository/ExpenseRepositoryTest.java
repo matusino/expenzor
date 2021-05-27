@@ -69,7 +69,6 @@ public class ExpenseRepositoryTest extends BaseTest{
         List<Expense> expenses = expenseRepository.findExpenseByMonth(LocalDateTime.now().getMonthValue()
                 ,LocalDateTime.now().getYear()
                 ,1);
-        System.out.println();
         assertThat(expenses.size()).isEqualTo(2);
     }
 

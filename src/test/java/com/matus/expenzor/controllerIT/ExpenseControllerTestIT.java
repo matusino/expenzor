@@ -84,16 +84,10 @@ public class ExpenseControllerTestIT extends BaseTest {
                  .accept(MediaType.APPLICATION_JSON)
                  .content(asJsonString(expenseDto))
                  .contentType(MediaType.APPLICATION_JSON))
-                 .andExpect(status().isOk());
+                 .andExpect(status().is2xxSuccessful());
          Optional<Expense> expense = expenseRepository.findById(1L);
          assertThat(expense.get().getValue()).isEqualTo(expenseDto.getValue());
     }
-//    @Test
-//    void shouldReturn404WhenGetAllExpensesPerYearForLoggedUser() throws Exception {
-//        mockMvc.perform(get("/expenses/{year}", 2019)
-//                .contentType(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isBadRequest());
-//    }
 
     @Test
     void shouldReturn200WhenGetAllExpensesPerYearForLoggedUser() throws Exception {
@@ -109,8 +103,7 @@ public class ExpenseControllerTestIT extends BaseTest {
     void shouldGetExpensesByMonthForCurrentYear() throws Exception {
         insertExpenseToDb();
         mockMvc.perform(get("/expenses/{month}/{year}/{username}",
-                LocalDateTime.now().getMonthValue(),
-                LocalDateTime.now().getYear(),"testUserName")
+                LocalDateTime.now().getMonthValue(), LocalDateTime.now().getYear(),"testUserName")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$",hasSize(1)))
