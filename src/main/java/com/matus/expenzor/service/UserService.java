@@ -21,4 +21,6 @@ public interface UserService {
 
     UserProfileDto userToUserProfileDto(User user);
 
+    Iterable<User> findAllUsers();
+
 }

@@ -18,7 +18,7 @@ public class SwaggerConfig {
     public Docket expenzorApi() {
         return new Docket(DocumentationType.SWAGGER_2)
                 .select()
-                .apis(RequestHandlerSelectors.any())
+                .apis(RequestHandlerSelectors.basePackage("com.matus.expenzor"))
                 .paths(PathSelectors.any())
                 .build()
                 .apiInfo(getApiInfo());
@@ -29,7 +29,7 @@ public class SwaggerConfig {
                 .title("Expenzor API")
                 .version("1.0")
                 .description("API for Expenzor - expense tracking app")
-                .contact(new Contact("Matus Sykora","localhost", "matusino.sykora@gmail.com"))
+                .contact(new Contact("Matus Sykora","localhost", "matus.test@mail.com"))
                 .license("Apache License Version 2.0")
                 .build();
     }

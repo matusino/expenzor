@@ -23,6 +23,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Iterable<User> findAllUsers() {
+        return userRepository.findAll();
+    }
+
+    @Override
     public User saveUser(User user) {
         return userRepository.save(user);
     }
@@ -61,4 +66,6 @@ public class UserServiceImpl implements UserService {
     public Integer fetchUserId(String username) {
         return userRepository.fetchUserId(username);
     }
+
+
 }
