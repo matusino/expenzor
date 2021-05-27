@@ -58,7 +58,7 @@ public class AuthenticationControllerTestIT extends BaseTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(request))
                 .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
+                .andExpect(status().is2xxSuccessful())
                 .andReturn();
         assertThat(result.getResponse().getContentAsString()).isEqualTo("User Registered");
     }

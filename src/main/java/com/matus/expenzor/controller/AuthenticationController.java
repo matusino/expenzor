@@ -38,11 +38,12 @@ public class AuthenticationController {
             return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
         }
         authenticationService.signUp(registerRequest);
-        return new ResponseEntity<>("User Registered", HttpStatus.OK);
+        return new ResponseEntity<>("User Registered", HttpStatus.CREATED);
     }
 
     @PostMapping("/login")
-    public RegisterResponse login(@RequestBody LoginRequest loginRequest) throws KeyException {
-        return authenticationService.login(loginRequest);
+    public ResponseEntity<RegisterResponse> login(@RequestBody LoginRequest loginRequest) throws KeyException {
+        RegisterResponse response = authenticationService.login(loginRequest);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

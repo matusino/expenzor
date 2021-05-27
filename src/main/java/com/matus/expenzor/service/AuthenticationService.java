@@ -17,4 +17,6 @@ public interface AuthenticationService {
     RegisterResponse login(LoginRequest loginRequest) throws KeyException;
 
     boolean matchPassword(User user, PasswordDTO passwordDTO);
+
+    void changePassword(User user, String newPassword);
 }
