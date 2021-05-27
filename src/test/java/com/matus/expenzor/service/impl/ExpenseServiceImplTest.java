@@ -4,7 +4,6 @@ import com.matus.expenzor.model.Category;
 import com.matus.expenzor.model.Expense;
 import com.matus.expenzor.model.User;
 import com.matus.expenzor.repository.ExpenseRepository;
-import com.matus.expenzor.service.ExpenseService;
 import com.matus.expenzor.utils.ExcelExporter;
 import org.junit.Before;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,7 +11,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 import javax.servlet.http.HttpServletResponse;
@@ -22,11 +20,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.*;
@@ -76,7 +71,7 @@ class ExpenseServiceImplTest {
     }
 
     @Test
-    void shouldFindAllUserExpensesByIdAdnYear() {
+    void shouldFindAllUserExpensesByIdAndYear() {
         //given
         List<Expense> expenseList = new ArrayList<>();
         int userId = Math.toIntExact(expense2.getUser().getId());
@@ -116,18 +111,4 @@ class ExpenseServiceImplTest {
         //then
         then(expenseRepository).should().deleteById(1L);
     }
-
-//    @Test
-//    void shouldExportXmlTable() throws IOException {
-//        //given
-//        List<Expense> expenses = new ArrayList<>();
-//        expenses.add(expense);
-//        HttpServletResponse response = new MockHttpServletResponse();
-////        doNothing().when(excelExporter).export(response);
-//        //when
-//        expenseService.export(response,expenses);
-//        //then
-//        then(excelExporter).should(times(1)).export(response);
-////        Mockito.verify(excelExporter, Mockito.times(1)).export(response);
-//    }
 }

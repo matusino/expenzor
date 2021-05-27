@@ -12,7 +12,6 @@ public class BaseTest {
             .withUsername("testuser")
             .withPassword("pass");
 
-
     static{
         mySQLContainer.start();
     }

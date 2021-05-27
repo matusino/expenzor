@@ -1,6 +1,7 @@
 package com.matus.expenzor.security;
 
 import com.matus.expenzor.exception.KeyException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -21,6 +22,7 @@ import java.util.function.Function;
 import static java.util.Date.from;
 
 @Service
+@Slf4j
 public class JwtProvider {
     private KeyStore keyStore;
 
@@ -31,6 +33,7 @@ public class JwtProvider {
             InputStream resourceAsStream = getClass().getResourceAsStream("/springblog.jks");
             keyStore.load(resourceAsStream, "secret".toCharArray());
         } catch (KeyStoreException | CertificateException | NoSuchAlgorithmException | IOException e) {
+            log.error("Exception occurred while loading keystore",e);
             throw new KeyException("Exception occurred while loading keystore", e);
         }
 
@@ -51,14 +54,7 @@ public class JwtProvider {
         try {
             return (PrivateKey) keyStore.getKey("springblog", "secret".toCharArray());
         } catch (KeyStoreException | NoSuchAlgorithmException | UnrecoverableKeyException e) {
-            throw new KeyException("Exception occurred while retrieving public key from keystore", e);
-        }
-    }
-
-    private PublicKey getPublickey() {
-        try {
-            return keyStore.getCertificate("springblog").getPublicKey();
-        } catch (KeyStoreException e) {
+            log.error("Exception occurred while retrieving public key from keystore",e);
             throw new KeyException("Exception occurred while retrieving public key from keystore", e);
         }
     }
@@ -67,7 +63,7 @@ public class JwtProvider {
         return extractClaim(token, Claims::getSubject);
     }
 
-    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+    private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
